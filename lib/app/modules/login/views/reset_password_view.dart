@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/login_controller.dart';
-import '../../../routes/app_pages.dart';
+import '../controllers/reset_password_controller.dart';
 
-class LoginView extends GetView<LoginController> {
-  const LoginView({super.key});
+class ResetPasswordView extends GetView<ResetPasswordController> {
+  const ResetPasswordView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +13,7 @@ class LoginView extends GetView<LoginController> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Extended Header dengan gradient yang elegan - diperbesar seperti absensi
+              // Extended Header dengan gradient yang elegan - diperbesar seperti register
               Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
@@ -34,7 +33,7 @@ class LoginView extends GetView<LoginController> {
                 padding: const EdgeInsets.fromLTRB(24, 40, 24, 60),
                 child: Column(
                   children: [
-                    // Logo dengan floating effect - ukuran diperbesar
+                    // Logo dengan floating effect - sama seperti register
                     Container(
                       height: 90,
                       width: 90,
@@ -61,7 +60,7 @@ class LoginView extends GetView<LoginController> {
 
                     // Welcome text dengan typography yang lebih premium
                     const Text(
-                      "Selamat Datang Kembali!",
+                      "Reset Password",
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -71,7 +70,7 @@ class LoginView extends GetView<LoginController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Ayo masuk untuk penjelajahan berlanjut",
+                      "Buat kata sandi baru yang aman untuk akun Anda",
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
@@ -85,7 +84,7 @@ class LoginView extends GetView<LoginController> {
 
               const SizedBox(height: 24),
 
-              // Konten utama dengan shadow card - positioned like absensi form
+              // Konten utama dengan shadow card - positioned like register form
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
@@ -108,44 +107,24 @@ class LoginView extends GetView<LoginController> {
                         padding: const EdgeInsets.all(32),
                         child: Column(
                           children: [
-                            // Email Input dengan design premium
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Email",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.04),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: TextField(
-                                    controller: controller.emailC,
-                                    decoration: _premiumInputDecoration("Masukkan email anda"),
-                                  ),
-                                ),
-                              ],
+                            // Info text tambahan
+                            Text(
+                              "Kata sandi baru Anda tidak boleh berbeda dengan kata sandi yang digunakan sebelumnya",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 32),
 
                             // Password Input dengan design premium
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Password",
+                                  "Password Baru",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -163,33 +142,76 @@ class LoginView extends GetView<LoginController> {
                                       ),
                                     ],
                                   ),
-                                  child: TextField(
-                                    controller: controller.passC,
-                                    obscureText: true,
-                                    decoration: _premiumInputDecoration("Password"),
-                                  ),
+                                  child: Obx(() => TextField(
+                                    controller: controller.passwordController,
+                                    obscureText: !controller.isPasswordVisible.value,
+                                    decoration: _premiumInputDecorationWithSuffix(
+                                      "Masukkan password baru",
+                                      Icons.lock,
+                                      IconButton(
+                                        icon: Icon(
+                                          controller.isPasswordVisible.value
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Colors.grey[600],
+                                        ),
+                                        onPressed: () => controller.togglePasswordVisibility(),
+                                      ),
+                                      controller.passwordError.value.isEmpty ? null : controller.passwordError.value,
+                                    ),
+                                  )),
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 20),
 
-                            // Forgot Password dengan alignment yang lebih baik
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  "Lupa password?",
+                            // Konfirmasi Password Input dengan design premium
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Konfirmasi Password",
                                   style: TextStyle(
-                                    color: const Color(0xFF05515D),
-                                    fontWeight: FontWeight.w600,
                                     fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
-                              ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.04),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Obx(() => TextField(
+                                    controller: controller.confirmPasswordController,
+                                    obscureText: !controller.isConfirmPasswordVisible.value,
+                                    decoration: _premiumInputDecorationWithSuffix(
+                                      "Konfirmasi password baru",
+                                      Icons.lock_outline,
+                                      IconButton(
+                                        icon: Icon(
+                                          controller.isConfirmPasswordVisible.value
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Colors.grey[600],
+                                        ),
+                                        onPressed: () => controller.toggleConfirmPasswordVisibility(),
+                                      ),
+                                      controller.confirmPasswordError.value.isEmpty ? null : controller.confirmPasswordError.value,
+                                    ),
+                                  )),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 32),
 
-                            // Sign In Button dengan gradient dan shadow premium
+                            // Reset Password Button dengan gradient dan shadow premium
                             Container(
                               width: double.infinity,
                               height: 56,
@@ -211,10 +233,10 @@ class LoginView extends GetView<LoginController> {
                                   ),
                                 ],
                               ),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  controller.login();
-                                },
+                              child: Obx(() => ElevatedButton(
+                                onPressed: controller.isLoading.value 
+                                    ? null 
+                                    : () => controller.resetPassword(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   shadowColor: Colors.transparent,
@@ -222,110 +244,24 @@ class LoginView extends GetView<LoginController> {
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                child: const Text(
-                                  "Sign In",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-
-                            // Divider dengan design yang lebih elegan
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.transparent,
-                                          Colors.grey[300]!,
-                                        ],
+                                child: controller.isLoading.value
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        "Reset Password",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: Text(
-                                    "ATAU",
-                                    style: TextStyle(
-                                      color: Colors.grey[500],
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 1,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.grey[300]!,
-                                          Colors.transparent,
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-
-                            // Google Button dengan design premium
-                            Container(
-                              width: double.infinity,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Colors.grey[200]!,
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: OutlinedButton.icon(
-                                icon: Container(
-                                  padding: const EdgeInsets.all(2),
-                                  child: Image.asset(
-                                    "assets/logo/google-icon.png",
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                ),
-                                label: const Text(
-                                  "Sign Up with Google",
-                                  style: TextStyle(
-                                    color: Color(0xFF1A1A1A),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  // Tambahkan auth Google jika ada
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  side: BorderSide.none,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                              ),
+                              )),
                             ),
                           ],
                         ),
@@ -333,11 +269,9 @@ class LoginView extends GetView<LoginController> {
                     ),
                     const SizedBox(height: 32),
 
-                    // Register link dengan design yang lebih premium
+                    // Back to Login link dengan design yang lebih premium
                     GestureDetector(
-                      onTap: () {
-                        Get.toNamed(Routes.REGISTER);
-                      },
+                      onTap: () => Get.back(),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                         decoration: BoxDecoration(
@@ -358,9 +292,9 @@ class LoginView extends GetView<LoginController> {
                               color: Color(0xFF6B7280),
                             ),
                             children: [
-                              const TextSpan(text: "Belum punya akun? "),
+                              const TextSpan(text: "Sudah ingat password? "),
                               TextSpan(
-                                text: "Daftar di sini",
+                                text: "Kembali ke Login",
                                 style: const TextStyle(
                                   color: Color(0xFF05515D),
                                   fontWeight: FontWeight.w600,
@@ -383,7 +317,7 @@ class LoginView extends GetView<LoginController> {
     );
   }
 
-  InputDecoration _premiumInputDecoration(String hint) {
+  InputDecoration _premiumInputDecorationWithSuffix(String hint, IconData icon, Widget suffix, String? errorText) {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(
@@ -391,6 +325,12 @@ class LoginView extends GetView<LoginController> {
         fontSize: 15,
         fontWeight: FontWeight.w400,
       ),
+      prefixIcon: Icon(
+        icon,
+        color: const Color(0xFF05515D),
+        size: 20,
+      ),
+      suffixIcon: suffix,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
@@ -409,9 +349,28 @@ class LoginView extends GetView<LoginController> {
           width: 2,
         ),
       ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: Colors.red,
+          width: 1.5,
+        ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: Colors.red,
+          width: 2,
+        ),
+      ),
       filled: true,
       fillColor: const Color(0xFFFAFAFA),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      errorText: errorText,
+      errorStyle: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+      ),
     );
   }
 }
